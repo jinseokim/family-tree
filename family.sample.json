@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "title": "Family Tree",
+  "defaultFocus": "kim-minjun",
+  "people": [
+    { "id": "kim-cheolsu", "name": "김철수", "gender": "M",
+      "spouses": ["choi-yeonghui"],
+      "private": { "birth": "1928-03-01", "death": "2001-11-20" } },
+    { "id": "choi-yeonghui", "name": "최영희", "gender": "F",
+      "private": { "birth": "1932-07-15", "death": "2015-04-02" } },
+    { "id": "park-jeongho", "name": "박정호", "gender": "M",
+      "spouses": ["han-malsun"],
+      "private": { "birth": "1930-01-10", "death": "1998-09-05" } },
+    { "id": "han-malsun", "name": "한말순", "gender": "F",
+      "private": { "birth": "1935-05-25" } },
+
+    { "id": "kim-yeongsu", "name": "김영수", "gender": "M",
+      "father": "kim-cheolsu", "mother": "choi-yeonghui",
+      "spouses": ["park-sunja"],
+      "private": { "birth": "1954-02-11" } },
+    { "id": "kim-yeongho", "name": "김영호", "gender": "M",
+      "father": "kim-cheolsu", "mother": "choi-yeonghui",
+      "private": { "birth": "1957-08-30" } },
+    { "id": "park-sunja", "name": "박순자", "gender": "F",
+      "father": "park-jeongho", "mother": "han-malsun",
+      "private": { "birth": "1956-12-01" } },
+
+    { "id": "kim-minji", "name": "김민지", "gender": "F",
+      "father": "kim-yeongsu", "mother": "park-sunja",
+      "spouses": ["jung-wooseong"],
+      "private": { "birth": "1982-04-18" } },
+    { "id": "jung-wooseong", "name": "정우성", "gender": "M",
+      "private": { "birth": "1980-10-02" } },
+    { "id": "kim-minjun", "name": "김민준", "gender": "M",
+      "father": "kim-yeongsu", "mother": "park-sunja",
+      "spouses": ["lee-seoyeon"],
+      "private": {
+        "birth": "1985-06-07",
+        "note": "가계도 관리자",
+        "links": ["https://github.com/example"]
+      } },
+    { "id": "kim-minsu", "name": "김민수", "gender": "M",
+      "father": "kim-yeongsu", "mother": "park-sunja",
+      "private": { "birth": "1990-01-23" } },
+    { "id": "lee-seoyeon", "name": "이서연", "gender": "F",
+      "private": { "birth": "1986-09-14" } },
+
+    { "id": "jung-yerin", "name": "정예린", "gender": "F",
+      "father": "jung-wooseong", "mother": "kim-minji",
+      "private": { "birth": "2012-03-03" } },
+    { "id": "kim-hajun", "name": "김하준", "gender": "M",
+      "father": "kim-minjun", "mother": "lee-seoyeon",
+      "private": { "birth": "2015-05-05" } },
+    { "id": "kim-jia", "name": "김지아", "gender": "F",
+      "father": "kim-minjun", "mother": "lee-seoyeon",
+      "private": { "birth": "2018-11-11" } }
+  ]
+}

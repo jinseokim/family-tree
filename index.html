@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>가계도</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="gate">
+    <div class="card">
+      <h1>가계도</h1>
+      <form id="gateForm">
+        <input id="gatePw" type="password" placeholder="읽기 암호" autocomplete="off">
+        <button type="submit">열기</button>
+      </form>
+      <div id="gateMsg"></div>
+    </div>
+  </div>
+
+  <div id="app" class="hidden" style="display:contents">
+    <header>
+      <h1 id="title">가계도</h1>
+      <input id="search" type="search" list="names" placeholder="이름 검색">
+      <datalist id="names"></datalist>
+      <label class="ck" title="혼인으로만 연결된 사람(배우자·형수·사돈 등) 표시">
+        <input type="checkbox" id="ckInlaw" checked> 배우자 쪽
+      </label>
+      <span class="chonctl" title="포커스 기준 몇 촌까지 표시할지 (최대값이면 전체)">
+        <button id="chonDec">−</button>
+        <input id="chonNum" type="number" min="0" inputmode="numeric">
+        <button id="chonInc">＋</button>
+        <span class="dim">촌</span>
+      </span>
+      <button id="btnView" title="촌수 기준 배치로 전환">촌수 보기</button>
+      <button id="btnEdit">편집 잠금해제</button>
+      <button id="btnAdd" class="hidden">＋ 인물</button>
+      <button id="btnPush" class="hidden" title="암호화해서 GitHub 저장소에 바로 커밋">GitHub에 저장</button>
+      <button id="btnSave" class="hidden" title="암호화된 데이터 파일을 내려받아 저장소에 커밋하세요">enc 내려받기</button>
+      <button id="btnBackup" class="hidden" title="평문 백업 (저장소에 커밋 금지!)">평문 백업</button>
+    </header>
+    <main>
+      <svg id="tree"><g id="world"></g></svg>
+      <aside id="detail"></aside>
+    </main>
+  </div>
+
+  <script src="crypto.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>가계도 관리 도구</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { display: block; padding: 24px; max-width: 760px; margin: 0 auto; }
+    textarea { width: 100%; height: 320px; font-family: ui-monospace, monospace; font-size: 12.5px;
+               background: var(--panel); color: var(--ink); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+    .row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; align-items: center; }
+    input[type="password"] { padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px;
+                             background: var(--panel); color: var(--ink); }
+    button { padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px;
+             background: var(--panel); color: var(--ink); cursor: pointer; }
+    button.primary { background: var(--accent); color: #fff; border: none; }
+    #msg { min-height: 20px; font-size: 13px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>가계도 관리 도구</h1>
+  <p class="dim">평문 <code>family.json</code>과 암호화된 <code>family.enc.json</code>을 브라우저 안에서만 상호 변환합니다.
+     (네트워크 전송 없음 · <code>tools/seal.mjs</code>와 동일한 형식)</p>
+
+  <div class="row">
+    <input type="file" id="file" accept=".json">
+    <span class="dim">평문 또는 enc 파일을 열거나, 아래에 직접 붙여넣으세요.</span>
+  </div>
+  <textarea id="text" spellcheck="false" placeholder='{"version":1, "people":[...]}'></textarea>
+
+  <div class="row">
+    <input id="readPw" type="password" placeholder="읽기 암호">
+    <input id="writePw" type="password" placeholder="쓰기 암호">
+  </div>
+  <div class="row">
+    <button id="btnSeal" class="primary">봉인 → family.enc.json 다운로드</button>
+    <button id="btnOpen">해제 → 평문 표시</button>
+    <button id="btnPlain">평문 다운로드</button>
+  </div>
+  <div id="msg"></div>
+
+  <script src="crypto.js"></script>
+  <script>
+    'use strict';
+    const $ = s => document.querySelector(s);
+    const msg = (t, err) => { $('#msg').textContent = t; $('#msg').style.color = err ? '#c0392b' : 'var(--accent)'; };
+
+    $('#file').addEventListener('change', async e => {
+      const f = e.target.files[0];
+      if (f) $('#text').value = await f.text();
+    });
+
+    function download(name, text) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+    function passwords() {
+      const r = $('#readPw').value, w = $('#writePw').value;
+      if (!r || !w) throw new Error('읽기/쓰기 암호를 모두 입력하세요.');
+      return [r, w];
+    }
+
+    $('#btnSeal').addEventListener('click', async () => {
+      try {
+        const [r, w] = passwords();
+        const doc = JSON.parse($('#text').value);
+        if (!Array.isArray(doc.people)) throw new Error('people 배열이 없습니다. 평문 형식인지 확인하세요.');
+        const privMap = {};
+        const people = doc.people.map(p => {
+          const { private: priv, ...pub } = p;
+          if (priv && Object.keys(priv).length) privMap[p.id] = priv;
+          return pub;
+        });
+        const out = {
+          format: 'familytree-sealed-v1',
+          public: await sealJSON({ ...doc, people }, r),
+          private: await sealJSON(privMap, w),
+        };
+        download('family.enc.json', JSON.stringify(out));
+        msg(`봉인 완료 — 인물 ${people.length}명. 내려받은 파일을 data/family.enc.json 로 커밋하세요.`);
+      } catch (e) { msg(e.message, true); }
+    });
+
+    $('#btnOpen').addEventListener('click', async () => {
+      try {
+        const [r, w] = passwords();
+        const sealed = JSON.parse($('#text').value);
+        if (!sealed.public) throw new Error('enc 형식이 아닙니다.');
+        const doc = await openJSON(sealed.public, r).catch(() => { throw new Error('읽기 암호가 올바르지 않습니다.'); });
+        const priv = await openJSON(sealed.private, w).catch(() => { throw new Error('쓰기 암호가 올바르지 않습니다.'); });
+        doc.people = doc.people.map(p => priv[p.id] ? { ...p, private: priv[p.id] } : p);
+        $('#text').value = JSON.stringify(doc, null, 2);
+        msg('해제 완료 — 평문이 위에 표시되었습니다. (저장소에 커밋 금지)');
+      } catch (e) { msg(e.message, true); }
+    });
+
+    $('#btnPlain').addEventListener('click', () => {
+      try { JSON.parse($('#text').value); download('family.json', $('#text').value); }
+      catch { msg('JSON이 올바르지 않습니다.', true); }
+    });
+  </script>
+</body>
+</html>
